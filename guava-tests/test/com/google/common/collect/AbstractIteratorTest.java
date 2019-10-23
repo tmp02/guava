@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.common.collect;
+package com.google.common.collect;//
 
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
@@ -77,6 +77,151 @@ public class AbstractIteratorTest extends TestCase {
     } catch (NoSuchElementException expected) {
     }
   }
+
+
+  public void PositiveTestForNextAndHasNext() {
+	    //Positive Test
+	    // This sample AbstractIterator returns 0 on the first call, 1 on the
+	    // second, then signals that it's reached the end of the data
+	    Iterator<Integer> iter =
+	        new AbstractIterator<Integer>() {
+	          private int rep;
+
+	          @Override
+	          public Integer computeNext() {
+	            switch (rep++) {
+	              case 0:
+	                return 0;
+	              case 1:
+	                return 1;
+	              case 2:
+	                return endOfData();
+	              default:
+	                fail("Should not have been invoked again");
+	                return null;
+	            }
+	          }
+	        };
+	    //hasNext() method and next() method will invoke computeNext() method
+	    //validate if iter has a next element in this the next element is the first element (rep = 0)
+	    assertTrue(iter.hasNext());
+	    // Iterate over iter and validate if the first element of iter is 0
+	    assertEquals(0, (int) iter.next());
+
+	    // verify idempotence of hasNext()
+	    //verify that iter has a second element (rep = 1) with hasNext()
+	    assertTrue(iter.hasNext());
+	    assertTrue(iter.hasNext());
+	    assertTrue(iter.hasNext());
+	    //like hasNext() have return true we can call next() to iterate over iter
+	    assertEquals(1, (int) iter.next());
+	    // the next element of iter is with rep = 2 in this case ComputeNext() will call endOfData() and is expected that hasNext() return false 
+	    assertFalse(iter.hasNext());
+
+	    // Make sure computeNext() doesn't get invoked again
+	    assertFalse(iter.hasNext());
+	  }
+
+  public void NegativeTestForNextAndHasNext() {
+	    //Negative Test
+	    // This sample AbstractIterator returns 0 on the first call, 1 on the
+	    // second. in this case we don't call endOfData() and in this case a exception is expected
+	    Iterator<Integer> iter =
+	        new AbstractIterator<Integer>() {
+	          private int rep;
+
+	          @Override
+	          public Integer computeNext() {
+	            switch (rep++) {
+	              case 0:
+	                return 0;
+	              case 1:
+	                return 1;
+	              case 2:
+	                return 2;
+                    default:
+                        fail("Should not have been invoked again");
+                        return null;
+	            }
+
+	          }
+	        };
+	    //hasNext() method and next() method will invoke computeNext() method
+	    //validate if iter has a next element in this case the next element is the first element (rep = 0)
+	    assertTrue(iter.hasNext());
+	    // Iterate over iter and validate if the first element of iter is 0
+	    assertEquals(0, (int) iter.next());
+
+	    //verify that iter has a second element (rep = 1) with hasNext()
+	    assertTrue(iter.hasNext());
+	    assertTrue(iter.hasNext());
+	    assertTrue(iter.hasNext());
+
+	    //like hasNext() have return true we can call next() to iterate over iter
+	    assertEquals(1, (int) iter.next());
+	    // the next element of iter is with rep = 2 in this case ComputeNext() will return 2 and hasNext() will return True
+	    assertTrue(iter.hasNext());
+
+      try {
+            // when call next() method computeNext() will be in a infinity loop and return a exception
+	    	iter.next();
+	    }
+	    catch(Exception e){
+	    }
+	    
+	  }
+  
+  public void NegativeTestForNextAndHasNext2() {
+	    //Negative Test
+	    // in this case we have the enfOfData in the last element of ComputeNext() but we will call next() method
+        // after see hasNext() return false so one exception is expected
+	    Iterator<Integer> iter =
+	        new AbstractIterator<Integer>() {
+	          private int rep;
+
+	          @Override
+	          public Integer computeNext() {
+	            switch (rep++) {
+	              case 0:
+	                return 0;
+	              case 1:
+	                return 1;
+	              case 2:
+	                return endOfData();
+	              default:
+	                fail("Should not have been invoked again");
+	                return null;
+	            }
+	          }
+	        };
+	    //hasNext() method and next() method will invoke computeNext() method
+	    //validate if iter has a next element in this the next element is the first element (rep = 0)
+	    assertTrue(iter.hasNext());
+	    // Iterate over iter and validate if the first element of iter is 0
+	    assertEquals(0, (int) iter.next());
+
+	    // verify idempotence of hasNext()
+	    //verify that iter has a second element (rep = 1) with hasNext()
+	    assertTrue(iter.hasNext());
+	    assertTrue(iter.hasNext());
+	    assertTrue(iter.hasNext());
+	    //like hasNext() have return true we can call next() to iterate over iter
+	    assertEquals(1, (int) iter.next());
+	    // the next element of iter is with rep = 2 in this case ComputeNext() will call endOfData() and is expected that hasNext() return false 
+	    assertFalse(iter.hasNext());
+
+	    // Make sure computeNext() doesn't get invoked again
+	    assertFalse(iter.hasNext());
+
+      try {
+          //call next() method after the lest element of iter in this case is expected a fail and throw an exception
+          iter.next();
+          fail();
+      }
+      catch(IllegalStateException e){
+      }
+	    
+	  }
 
   public void testDefaultBehaviorOfPeek() {
     /*
